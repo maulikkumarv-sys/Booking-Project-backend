@@ -48,13 +48,26 @@ const addbooking = async (req, res) => {
 
 
         for (let booking of bookings) {
+            const currentstart = timeToMinutes(booking.startTime)
+            const currentend = timeToMinutes(booking.endTime)
             const today = new Date().toISOString().split("T")[0];
 
             const now = new Date();
             const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
-            
-            let status = "pending";
+            // if (currentMinutes < currentstart) {
+            //     booking.status = "pending";
+            // }
+            // else if (currentMinutes >= currentstart && currentMinutes < currentend) {
+            //     booking.status = "confirmed";
+            // }
+            // else {
+            //     booking.status = "done";
+            // }
+            // const now = new Date();
+            // const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+            let status = "pending"; // default
 
             if (booking.date === today) {
                 const start = timeToMinutes(booking.startTime);

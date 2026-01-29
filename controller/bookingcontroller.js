@@ -2,27 +2,21 @@
 const bookingmodel = require("../model/bookingmodel")
 
 function timeToMinutes(time) {
-    const [t, modifier] = time.split(" ")
-    let [hours, minutes] = t.split(":")
+    // Handles "14:30"
+    if (!time.includes(" ")) {
+        const [hours, minutes] = time.split(":").map(Number);
+        return hours * 60 + minutes;
+    }
 
-    hours = parseInt(hours)
-    minutes = parseInt(minutes)
+    // Handles "02:30 PM"
+    const [t, modifier] = time.split(" ");
+    let [hours, minutes] = t.split(":").map(Number);
 
-    if (modifier === "PM" && hours !== 12) hours += 12
-    if (modifier === "AM" && hours === 12) hours = 0
+    if (modifier === "PM" && hours !== 12) hours += 12;
+    if (modifier === "AM" && hours === 12) hours = 0;
 
-    return hours * 60 + minutes
-
-
+    return hours * 60 + minutes;
 }
-const getCurrentMinutesIST = () => {
-    const now = new Date();
-
-    const utcHours = now.getUTCHours();
-    const utcMinutes = now.getUTCMinutes();
-
-    return utcHours * 60 + utcMinutes + 330; // IST = UTC + 5:30
-};
 
 
 

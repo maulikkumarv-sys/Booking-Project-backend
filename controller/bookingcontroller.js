@@ -15,6 +15,14 @@ function timeToMinutes(time) {
 
 
 }
+const getCurrentMinutesIST = () => {
+    const now = new Date();
+
+    const utcHours = now.getUTCHours();
+    const utcMinutes = now.getUTCMinutes();
+
+    return utcHours * 60 + utcMinutes + 330; // IST = UTC + 5:30
+};
 
 
 

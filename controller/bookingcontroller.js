@@ -55,32 +55,32 @@ const addbooking = async (req, res) => {
             const now = new Date();
             const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
-            // if (currentMinutes < currentstart) {
-            //     booking.status = "pending";
-            // }
-            // else if (currentMinutes >= currentstart && currentMinutes < currentend) {
-            //     booking.status = "confirmed";
-            // }
-            // else {
-            //     booking.status = "done";
-            // }
+            if (currentMinutes < currentstart) {
+                booking.status = "pending";
+            }
+            else if (currentMinutes >= currentstart && currentMinutes < currentend) {
+                booking.status = "confirmed";
+            }
+            else {
+                booking.status = "done";
+            }
             // const now = new Date();
             // const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
-            let status = "pending"; // default
+            // let status = "pending"; // default
 
-            if (booking.date === today) {
-                const start = timeToMinutes(booking.startTime);
-                const end = timeToMinutes(booking.endTime);
+            // if (booking.date === today) {
+            //     const start = timeToMinutes(booking.startTime);
+            //     const end = timeToMinutes(booking.endTime);
 
-                if (currentMinutes >= start && currentMinutes < end) {
-                    status = "confirmed";
-                } else if (currentMinutes >= end) {
-                    status = "done";
-                }
-            }
+            //     if (currentMinutes >= start && currentMinutes < end) {
+            //         status = "confirmed";
+            //     } else if (currentMinutes >= end) {
+            //         status = "done";
+            //     }
+            // }
 
-            await booking.save();
+            // await booking.save();
 
             if (newstart < currentend && newend > currentstart) {
                 return res.status(400).json({

@@ -67,7 +67,7 @@ function timeToMinutes(time) {
 //             // const now = new Date();
 //             // const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
-//             let status = "pending"; // default
+//             let status = "pending";
 
 //             if (booking.date === today) {
 //                 const start = timeToMinutes(booking.startTime);
@@ -116,106 +116,60 @@ function timeToMinutes(time) {
 
 
 // }
-
 const addbooking = async (req, res) => {
-
     try {
-        const { date, startTime, endTime } = req.body
+        const { date, startTime, endTime } = req.body;
 
+        const bookings = await bookingmodel.find({ date });
 
+        const newstart = timeToMinutes(startTime);
+        const newend = timeToMinutes(endTime);
 
-        const bookings = await bookingmodel.find({ date })
-
-        const newstart = timeToMinutes(startTime)
-        const newend = timeToMinutes(endTime)
-
-        const today = new Date().toISOString().split('T')[0]
+        const today = new Date().toISOString().split("T")[0];
 
         if (date === today) {
-            const now = new Date();
-            const currentMinutes = now.getHours() * 60 + now.getMinutes();
+            const currentMinutes = getCurrentMinutesIST();
 
-            if (newend <= currentMinutes) {
+            if (newstart <= currentMinutes) {
                 return res.status(400).json({
-                    message: "This time slot has already expired",
+                    message: "This time slot has already started or expired",
                 });
             }
         }
 
-
-
-
         for (let booking of bookings) {
-            const currentstart = timeToMinutes(booking.startTime)
-            const currentend = timeToMinutes(booking.endTime)
-            const today = new Date().toISOString().split("T")[0];
+            const currentstart = timeToMinutes(booking.startTime);
+            const currentend = timeToMinutes(booking.endTime);
 
-            const now = new Date();
-            const currentMinutes = now.getHours() * 60 + now.getMinutes();
-
-            // if (currentMinutes < currentstart) {
-            //     booking.status = "pending";
-            // }
-            // else if (currentMinutes >= currentstart && currentMinutes < currentend) {
-            //     booking.status = "confirmed";
-            // }
-            // else {
-            //     booking.status = "done";
-            // }
-            // const now = new Date();
-            // const currentMinutes = now.getHours() * 60 + now.getMinutes();
-
-            let status = "pending"; // default
+            const currentMinutes = getCurrentMinutesIST();
 
             if (booking.date === today) {
-                const start = timeToMinutes(booking.startTime);
-                const end = timeToMinutes(booking.endTime);
-
-                if (currentMinutes >= start && currentMinutes < end) {
-                    status = "confirmed";
-                } else if (currentMinutes >= end) {
-                    status = "done";
+                if (currentMinutes >= currentstart && currentMinutes < currentend) {
+                    booking.status = "confirmed";
+                } else if (currentMinutes >= currentend) {
+                    booking.status = "done";
+                } else {
+                    booking.status = "pending";
                 }
-            }
 
-            await booking.save();
+                await booking.save();
+            }
 
             if (newstart < currentend && newend > currentstart) {
                 return res.status(400).json({
-                    message: "This time slot is already booked"
+                    message: "This time slot is already booked",
                 });
             }
         }
 
-
-        const existbooking = await bookingmodel.findOne({
-            date, startTime, endTime,
-
-
-
-
-        })
-
-
-
-
-
-
-
-        const data = await bookingmodel.create(req.body)
-        return res.send(data)
-
+        const data = await bookingmodel.create(req.body);
+        return res.status(201).json(data);
 
     } catch (error) {
-        console.log(error)
+        console.log(error);
+        return res.status(500).json({ message: "Server error" });
     }
-
-
-
-
-}
-
-
+};
 
 
 

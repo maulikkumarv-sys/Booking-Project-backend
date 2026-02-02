@@ -24,74 +24,169 @@ function getCurrentMinutesIST() {
 }
 
 
+// const addbooking = async (req, res) => {
+//     try {
+//         const { date, startTime, endTime } = req.body;
+
+//         if (!date || !startTime || !endTime) {
+//             return res.status(400).json({ message: "Missing fields" });
+//         }
+
+//         const bookings = await bookingmodel.find({ date });
+
+//         const newstart = timeToMinutes(startTime);
+//         const newend = timeToMinutes(endTime);
+
+//         if (newstart >= newend) {
+//             return res.status(400).json({ message: "Invalid time range" });
+//         }
+
+//         const today = new Date().toISOString().split("T")[0];
+
+//         if (date === today) {
+//             const currentMinutes = getCurrentMinutesIST();
+//             if (newstart <= currentMinutes) {
+//                 return res.status(400).json({
+//                     message: "This time slot has already started or expired",
+//                 });
+//             }
+//         }
+
+//         for (let booking of bookings) {
+//             const currentstart = timeToMinutes(booking.startTime);
+//             const currentend = timeToMinutes(booking.endTime);
+
+//             if (newstart < currentend && newend > currentstart) {
+//                 return res.status(400).json({
+//                     message: "This time slot is already booked",
+//                 });
+//             }
+
+//             if (booking.date === today) {
+//                 const currentMinutes = getCurrentMinutesIST();
+
+//                 let newStatus = "pending";
+//                 if (currentMinutes >= currentstart && currentMinutes < currentend) {
+//                     newStatus = "confirmed";
+//                 } else if (currentMinutes >= currentend) {
+//                     newStatus = "done";
+//                 }
+
+//                 if (booking.status !== newStatus) {
+//                     booking.status = newStatus;
+//                     await booking.save();
+//                 }
+//             }
+//         }
+
+//         const data = await bookingmodel.create(req.body);
+//         return res.status(201).json(data);
+
+//     } catch (error) {
+//         console.error("Booking Error:", error);
+//         return res.status(500).json({ message: "Server error" });
+//     }
+// };
+
+
+
 const addbooking = async (req, res) => {
+
     try {
-        const { date, startTime, endTime } = req.body;
+        const { date, startTime, endTime } = req.body
 
-        if (!date || !startTime || !endTime) {
-            return res.status(400).json({ message: "Missing fields" });
-        }
 
-        const bookings = await bookingmodel.find({ date });
 
-        const newstart = timeToMinutes(startTime);
-        const newend = timeToMinutes(endTime);
+        const bookings = await bookingmodel.find({ date })
 
-        if (newstart >= newend) {
-            return res.status(400).json({ message: "Invalid time range" });
-        }
+        const newstart = timeToMinutes(startTime)
+        const newend = timeToMinutes(endTime)
 
-        const today = new Date().toISOString().split("T")[0];
+        const today = new Date().toISOString().split('T')[0]
 
-        // 🚫 block expired slots ONLY for today
         if (date === today) {
-            const currentMinutes = getCurrentMinutesIST();
-            if (newstart <= currentMinutes) {
+            const now = new Date();
+            const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+            if (newend <= currentMinutes) {
                 return res.status(400).json({
-                    message: "This time slot has already started or expired",
+                    message: "This time slot has already expired",
                 });
             }
         }
+
+
+
 
         for (let booking of bookings) {
-            const currentstart = timeToMinutes(booking.startTime);
-            const currentend = timeToMinutes(booking.endTime);
+            const currentstart = timeToMinutes(booking.startTime)
+            const currentend = timeToMinutes(booking.endTime)
+            const today = new Date().toISOString().split("T")[0];
 
-            // 🚫 overlap check (ALL dates)
-            if (newstart < currentend && newend > currentstart) {
-                return res.status(400).json({
-                    message: "This time slot is already booked",
-                });
+            const now = new Date();
+            const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+            // if (currentMinutes < currentstart) {
+            //     booking.status = "pending";
+            // }
+            // else if (currentMinutes >= currentstart && currentMinutes < currentend) {
+            //     booking.status = "confirmed";
+            // }
+            // else {
+            //     booking.status = "done";
+            // }
+            // const now = new Date();
+            // const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+            let status = "pending"; // default
+
+            if (booking.date === today) {
+                const start = timeToMinutes(booking.startTime);
+                const end = timeToMinutes(booking.endTime);
+
+                if (currentMinutes >= start && currentMinutes < end) {
+                    status = "confirmed";
+                } else if (currentMinutes >= end) {
+                    status = "done";
+                }
             }
 
-            // ✅ update status ONLY for today
-            if (booking.date === today) {
-                const currentMinutes = getCurrentMinutesIST();
+            await booking.save();
 
-                let newStatus = "pending";
-                if (currentMinutes >= currentstart && currentMinutes < currentend) {
-                    newStatus = "confirmed";
-                } else if (currentMinutes >= currentend) {
-                    newStatus = "done";
-                }
-
-                if (booking.status !== newStatus) {
-                    booking.status = newStatus;
-                    await booking.save();
-                }
+            if (newstart < currentend && newend > currentstart) {
+                return res.status(400).json({
+                    message: "This time slot is already booked"
+                });
             }
         }
 
-        const data = await bookingmodel.create(req.body);
-        return res.status(201).json(data);
+
+        const existbooking = await bookingmodel.findOne({
+            date, startTime, endTime,
+
+
+
+
+        })
+
+
+
+
+
+
+
+        const data = await bookingmodel.create(req.body)
+        return res.send(data)
+
 
     } catch (error) {
-        console.error("Booking Error:", error);
-        return res.status(500).json({ message: "Server error" });
+        console.log(error)
     }
-};
 
 
+
+
+}
 
 
 const getbooking = async (req, res) => {

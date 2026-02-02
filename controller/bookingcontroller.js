@@ -15,78 +15,14 @@ function timeToMinutes(time) {
     return hours * 60 + minutes;
 }
 
-function getCurrentMinutesIST() {
-    const now = new Date();
-    const ist = new Date(
-        now.toLocaleString("en-US", { timeZone: "Asia/Kolkata" })
-    );
-    return ist.getHours() * 60 + ist.getMinutes();
-}
+// function getCurrentMinutesIST() {
+//     const now = new Date();
+//     const ist = new Date(
+//         now.toLocaleString("en-US", { timeZone: "Asia/Kolkata" })
+//     );
+//     return ist.getHours() * 60 + ist.getMinutes();
+// }
 
-
-// const addbooking = async (req, res) => {
-//     try {
-//         const { date, startTime, endTime } = req.body;
-
-//         if (!date || !startTime || !endTime) {
-//             return res.status(400).json({ message: "Missing fields" });
-//         }
-
-//         const bookings = await bookingmodel.find({ date });
-
-//         const newstart = timeToMinutes(startTime);
-//         const newend = timeToMinutes(endTime);
-
-//         if (newstart >= newend) {
-//             return res.status(400).json({ message: "Invalid time range" });
-//         }
-
-//         const today = new Date().toISOString().split("T")[0];
-
-//         if (date === today) {
-//             const currentMinutes = getCurrentMinutesIST();
-//             if (newstart <= currentMinutes) {
-//                 return res.status(400).json({
-//                     message: "This time slot has already started or expired",
-//                 });
-//             }
-//         }
-
-//         for (let booking of bookings) {
-//             const currentstart = timeToMinutes(booking.startTime);
-//             const currentend = timeToMinutes(booking.endTime);
-
-//             if (newstart < currentend && newend > currentstart) {
-//                 return res.status(400).json({
-//                     message: "This time slot is already booked",
-//                 });
-//             }
-
-//             if (booking.date === today) {
-//                 const currentMinutes = getCurrentMinutesIST();
-
-//                 let newStatus = "pending";
-//                 if (currentMinutes >= currentstart && currentMinutes < currentend) {
-//                     newStatus = "confirmed";
-//                 } else if (currentMinutes >= currentend) {
-//                     newStatus = "done";
-//                 }
-
-//                 if (booking.status !== newStatus) {
-//                     booking.status = newStatus;
-//                     await booking.save();
-//                 }
-//             }
-//         }
-
-//         const data = await bookingmodel.create(req.body);
-//         return res.status(201).json(data);
-
-//     } catch (error) {
-//         console.error("Booking Error:", error);
-//         return res.status(500).json({ message: "Server error" });
-//     }
-// };
 
 
 
@@ -226,3 +162,86 @@ const updatebooking = async (req, res) => {
 }
 
 module.exports = { addbooking, getbooking, deletbooking, updatebooking, timeToMinutes }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// const addbooking = async (req, res) => {
+//     try {
+//         const { date, startTime, endTime } = req.body;
+
+//         if (!date || !startTime || !endTime) {
+//             return res.status(400).json({ message: "Missing fields" });
+//         }
+
+//         const bookings = await bookingmodel.find({ date });
+
+//         const newstart = timeToMinutes(startTime);
+//         const newend = timeToMinutes(endTime);
+
+//         if (newstart >= newend) {
+//             return res.status(400).json({ message: "Invalid time range" });
+//         }
+
+//         const today = new Date().toISOString().split("T")[0];
+
+//         if (date === today) {
+//             const currentMinutes = getCurrentMinutesIST();
+//             if (newstart <= currentMinutes) {
+//                 return res.status(400).json({
+//                     message: "This time slot has already started or expired",
+//                 });
+//             }
+//         }
+
+//         for (let booking of bookings) {
+//             const currentstart = timeToMinutes(booking.startTime);
+//             const currentend = timeToMinutes(booking.endTime);
+
+//             if (newstart < currentend && newend > currentstart) {
+//                 return res.status(400).json({
+//                     message: "This time slot is already booked",
+//                 });
+//             }
+
+//             if (booking.date === today) {
+//                 const currentMinutes = getCurrentMinutesIST();
+
+//                 let newStatus = "pending";
+//                 if (currentMinutes >= currentstart && currentMinutes < currentend) {
+//                     newStatus = "confirmed";
+//                 } else if (currentMinutes >= currentend) {
+//                     newStatus = "done";
+//                 }
+
+//                 if (booking.status !== newStatus) {
+//                     booking.status = newStatus;
+//                     await booking.save();
+//                 }
+//             }
+//         }
+
+//         const data = await bookingmodel.create(req.body);
+//         return res.status(201).json(data);
+
+//     } catch (error) {
+//         console.error("Booking Error:", error);
+//         return res.status(500).json({ message: "Server error" });
+//     }
+// };

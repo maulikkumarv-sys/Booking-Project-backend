@@ -31,7 +31,7 @@ const addbooking = async (req, res) => {
         const newstart = timeToMinutes(startTime)
         const newend = timeToMinutes(endTime)
 
-        const today = new Date().toLocaleDateString().split('T')[0]
+        const today = new Date().toLocaleDateString("en-CA").split('T')[0]
 
         if (date === today) {
             const now = new Date();
@@ -50,7 +50,7 @@ const addbooking = async (req, res) => {
         for (let booking of bookings) {
             const currentstart = timeToMinutes(booking.startTime)
             const currentend = timeToMinutes(booking.endTime)
-            const today = new Date().toLocaleDateString().split("T")[0];
+            const today = new Date().toLocaleDateString("en-CA").split("T")[0];
 
             const now = new Date();
             const currentMinutes = now.getHours() * 60 + now.getMinutes();

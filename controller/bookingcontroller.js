@@ -31,19 +31,18 @@ const addbooking = async (req, res) => {
         const newstart = timeToMinutes(startTime)
         const newend = timeToMinutes(endTime)
 
-        const today = new Date().toLocaleDateString("en-CA");
+        const today = new Date().toISOString().split('T')[0]
 
-if (date === today) {
-  const now = new Date();
-  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+        if (date === today) {
+            const now = new Date();
+            const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
-  if (newend <= currentMinutes) {
-    return res.status(400).json({
-      message: "This time slot has already expired",
-    });
-  }
-}
-
+            if (newend <= currentMinutes) {
+                return res.status(400).json({
+                    message: "This time slot has already expired",
+                });
+            }
+        }
 
 
 

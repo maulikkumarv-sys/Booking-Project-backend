@@ -7,23 +7,23 @@ const bookingSchema = new mongoose.Schema(
       required: true,
       trim: true
     },
-    email:{
-       type:String,
-        required: true,
-        unique: true,
+    email: {
+      type: String,
+      required: true,
+      unique: true,
       lowercase: true
 
     },
-    phone:{
-      type:String,
-       required: true
+    phone: {
+      type: String,
+      required: true
     },
     date: {
       type: String,
       required: true
     },
     startTime: {
-      type: String, 
+      type: String,
       required: true
     },
     endTime: {
@@ -32,12 +32,15 @@ const bookingSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["pending", "confirmed", "cancelled","done"],
+      enum: ["pending", "confirmed", "cancelled", "done"],
       default: "pending"
+    }, doctorId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "doctor"
     },
   },
   { timestamps: true }
 )
 
 const bookingmodel = mongoose.model("booking", bookingSchema)
-module.exports=bookingmodel
+module.exports = bookingmodel

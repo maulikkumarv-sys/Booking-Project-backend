@@ -1,27 +1,20 @@
 
 const bookingmodel = require("../model/bookingmodel")
+
 function timeToMinutes(time) {
-    if (!time.includes(" ")) {
-        const [hours, minutes] = time.split(":").map(Number);
-        return hours * 60 + minutes;
-    }
+    const [t, modifier] = time.split(" ")
+    let [hours, minutes] = t.split(":")
 
-    const [t, modifier] = time.split(" ");
-    let [hours, minutes] = t.split(":").map(Number);
+    hours = parseInt(hours)
+    minutes = parseInt(minutes)
 
-    if (modifier === "PM" && hours !== 12) hours += 12;
-    if (modifier === "AM" && hours === 12) hours = 0;
+    if (modifier === "PM" && hours !== 12) hours += 12
+    if (modifier === "AM" && hours === 12) hours = 0
 
-    return hours * 60 + minutes;
+    return hours * 60 + minutes
+
+
 }
-
-// function getCurrentMinutesIST() {
-//     const now = new Date();
-//     const ist = new Date(
-//         now.toLocaleString("en-US", { timeZone: "Asia/Kolkata" })
-//     );
-//     return ist.getHours() * 60 + ist.getMinutes();
-// }
 
 
 
@@ -29,11 +22,11 @@ function timeToMinutes(time) {
 const addbooking = async (req, res) => {
 
     try {
-        const { date, startTime, endTime } = req.body
+        const { date, startTime, endTime, doctorId } = req.body
 
 
 
-        const bookings = await bookingmodel.find({ date })
+        const bookings = await bookingmodel.find({ date, doctorId })
 
         const newstart = timeToMinutes(startTime)
         const newend = timeToMinutes(endTime)
@@ -62,19 +55,9 @@ const addbooking = async (req, res) => {
             const now = new Date();
             const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
-            // if (currentMinutes < currentstart) {
-            //     booking.status = "pending";
-            // }
-            // else if (currentMinutes >= currentstart && currentMinutes < currentend) {
-            //     booking.status = "confirmed";
-            // }
-            // else {
-            //     booking.status = "done";
-            // }
-            // const now = new Date();
-            // const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
-            let status = "pending"; // default
+
+            let status = "pending";
 
             if (booking.date === today) {
                 const start = timeToMinutes(booking.startTime);
@@ -125,9 +108,16 @@ const addbooking = async (req, res) => {
 }
 
 
+
+
+
 const getbooking = async (req, res) => {
     try {
-        const data = await bookingmodel.find({})
+        const { date, doctorId } = req.body
+        const data = await bookingmodel.find({
+            date,
+            doctorId
+        })
         return res.send(data)
 
 
@@ -135,6 +125,19 @@ const getbooking = async (req, res) => {
         console.log(error)
     }
 }
+
+
+const getBookingByDoctor = async (req, res) => {
+    try {
+        const doctorId = req.params.id;
+        const data = await bookingmodel.find({ doctorId }).populate("doctorId");
+
+        res.send(data);
+    } catch (error) {
+        console.log(error);
+    }
+};
+
 
 const deletbooking = async (req, res) => {
     const id = req.params.id
@@ -161,87 +164,4 @@ const updatebooking = async (req, res) => {
     }
 }
 
-module.exports = { addbooking, getbooking, deletbooking, updatebooking, timeToMinutes }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// const addbooking = async (req, res) => {
-//     try {
-//         const { date, startTime, endTime } = req.body;
-
-//         if (!date || !startTime || !endTime) {
-//             return res.status(400).json({ message: "Missing fields" });
-//         }
-
-//         const bookings = await bookingmodel.find({ date });
-
-//         const newstart = timeToMinutes(startTime);
-//         const newend = timeToMinutes(endTime);
-
-//         if (newstart >= newend) {
-//             return res.status(400).json({ message: "Invalid time range" });
-//         }
-
-//         const today = new Date().toISOString().split("T")[0];
-
-//         if (date === today) {
-//             const currentMinutes = getCurrentMinutesIST();
-//             if (newstart <= currentMinutes) {
-//                 return res.status(400).json({
-//                     message: "This time slot has already started or expired",
-//                 });
-//             }
-//         }
-
-//         for (let booking of bookings) {
-//             const currentstart = timeToMinutes(booking.startTime);
-//             const currentend = timeToMinutes(booking.endTime);
-
-//             if (newstart < currentend && newend > currentstart) {
-//                 return res.status(400).json({
-//                     message: "This time slot is already booked",
-//                 });
-//             }
-
-//             if (booking.date === today) {
-//                 const currentMinutes = getCurrentMinutesIST();
-
-//                 let newStatus = "pending";
-//                 if (currentMinutes >= currentstart && currentMinutes < currentend) {
-//                     newStatus = "confirmed";
-//                 } else if (currentMinutes >= currentend) {
-//                     newStatus = "done";
-//                 }
-
-//                 if (booking.status !== newStatus) {
-//                     booking.status = newStatus;
-//                     await booking.save();
-//                 }
-//             }
-//         }
-
-//         const data = await bookingmodel.create(req.body);
-//         return res.status(201).json(data);
-
-//     } catch (error) {
-//         console.error("Booking Error:", error);
-//         return res.status(500).json({ message: "Server error" });
-//     }
-// };
+module.exports = { addbooking, getbooking, deletbooking, updatebooking, timeToMinutes, getBookingByDoctor }

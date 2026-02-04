@@ -22,16 +22,16 @@ function timeToMinutes(time) {
 const addbooking = async (req, res) => {
 
     try {
-        const { date, startTime, endTime,doctorId } = req.body
+        const { date, startTime, endTime, doctorId } = req.body
 
 
 
-        const bookings = await bookingmodel.find({ date,doctorId })
+        const bookings = await bookingmodel.find({ date, doctorId })
 
         const newstart = timeToMinutes(startTime)
         const newend = timeToMinutes(endTime)
 
-        const today = new Date().toLocaleDateString("en-CA").split('T')[0]
+        const today = new Date().toLocaleDateString("en-IN").split('T')[0]
 
         if (date === today) {
             const now = new Date();
@@ -50,14 +50,14 @@ const addbooking = async (req, res) => {
         for (let booking of bookings) {
             const currentstart = timeToMinutes(booking.startTime)
             const currentend = timeToMinutes(booking.endTime)
-            const today = new Date().toLocaleDateString("en-CA").split("T")[0];
+            const today = new Date().toLocaleDateString("en-IN").split("T")[0];
 
             const now = new Date();
             const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
-           
 
-            let status = "pending"; 
+
+            let status = "pending";
 
             if (booking.date === today) {
                 const start = timeToMinutes(booking.startTime);
@@ -80,7 +80,7 @@ const addbooking = async (req, res) => {
         }
 
 
-        
+
 
 
 
@@ -106,7 +106,7 @@ const addbooking = async (req, res) => {
 
 const getbooking = async (req, res) => {
     try {
-      const  { date, doctorId }= req.body
+        const { date, doctorId } = req.body
         const data = await bookingmodel.find({
             date,
             doctorId
@@ -121,14 +121,14 @@ const getbooking = async (req, res) => {
 
 
 const getBookingByDoctor = async (req, res) => {
-  try {
-    const doctorId = req.params.id; 
-    const data = await bookingmodel.find({doctorId}).populate("doctorId");
+    try {
+        const doctorId = req.params.id;
+        const data = await bookingmodel.find({ doctorId }).populate("doctorId");
 
-    res.send(data);
-  } catch (error) {
-    console.log(error);
-  }
+        res.send(data);
+    } catch (error) {
+        console.log(error);
+    }
 };
 
 
@@ -157,4 +157,4 @@ const updatebooking = async (req, res) => {
     }
 }
 
-module.exports = { addbooking, getbooking, deletbooking, updatebooking, timeToMinutes,getBookingByDoctor }
+module.exports = { addbooking, getbooking, deletbooking, updatebooking, timeToMinutes, getBookingByDoctor }
